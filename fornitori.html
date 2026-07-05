@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fornitori Magliette — Confronto Prezzi Reali 2026</title>
+  <style>
+    :root {
+      --bg:#0f1117; --bg2:#161b22; --bg3:#1c2128;
+      --border:#30363d; --text:#e6edf3; --muted:#8b949e;
+      --accent:#58a6ff; --green:#3fb950; --red:#f85149;
+      --orange:#d29922; --purple:#bc8cff; --teal:#39d353;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:-apple-system,'Segoe UI',sans-serif; line-height:1.7; }
+    a { color:var(--accent); }
+
+    .hero {
+      background:linear-gradient(135deg,#0d1117,#161b22,#1a2620);
+      border-bottom:1px solid var(--border); padding:52px 24px 40px; text-align:center;
+    }
+    .hero-badge {
+      display:inline-block; background:rgba(63,185,80,0.1);
+      border:1px solid rgba(63,185,80,0.3); border-radius:20px;
+      padding:4px 16px; font-size:0.76rem; letter-spacing:1px;
+      text-transform:uppercase; color:var(--green); margin-bottom:16px;
+    }
+    .hero h1 { font-size:clamp(1.6rem,4vw,2.4rem); color:#fff; margin-bottom:8px; }
+    .hero h1 span { color:var(--green); }
+    .hero-sub { color:var(--muted); font-size:0.9rem; }
+
+    nav {
+      position:sticky; top:0; z-index:100;
+      background:rgba(15,17,23,0.97); backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--border);
+      display:flex; overflow-x:auto; scrollbar-width:none; padding:0 12px;
+    }
+    nav::-webkit-scrollbar { display:none; }
+    .ntab {
+      white-space:nowrap; padding:13px 16px; font-size:0.8rem;
+      color:var(--muted); cursor:pointer; border-bottom:2px solid transparent;
+      background:none; border-top:none; border-left:none; border-right:none;
+      font-family:inherit; transition:all 0.2s;
+    }
+    .ntab:hover { color:var(--text); }
+    .ntab.active { color:var(--green); border-bottom-color:var(--green); }
+
+    .container { max-width:960px; margin:0 auto; padding:36px 20px; }
+    section { display:none; }
+    section.active { display:block; }
+
+    h2 { font-size:1.4rem; color:#fff; margin-bottom:6px; font-weight:600; }
+    .sec-desc { color:var(--muted); font-size:0.88rem; margin-bottom:24px; }
+    h3 { font-size:1.05rem; color:var(--text); margin:24px 0 12px; font-weight:600; }
+    p { color:#c9d1d9; font-size:0.9rem; margin-bottom:10px; }
+    ul { padding-left:18px; margin-bottom:12px; }
+    li { color:#c9d1d9; font-size:0.88rem; margin-bottom:5px; }
+    strong { color:var(--text); }
+    code { background:var(--bg3); padding:1px 6px; border-radius:3px; font-size:0.8rem; color:var(--teal); }
+
+    /* WINNER BADGE */
+    .winner { display:inline-flex; align-items:center; gap:4px; background:rgba(63,185,80,0.15); border:1px solid rgba(63,185,80,0.4); border-radius:4px; padding:2px 8px; font-size:0.72rem; color:var(--green); font-weight:700; }
+    .badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:0.73rem; font-weight:600; }
+    .badge.g { background:rgba(63,185,80,0.12); color:var(--green); }
+    .badge.r { background:rgba(248,81,73,0.12); color:var(--red); }
+    .badge.o { background:rgba(210,153,34,0.12); color:var(--orange); }
+    .badge.b { background:rgba(88,166,255,0.12); color:var(--accent); }
+    .badge.p { background:rgba(188,140,255,0.12); color:var(--purple); }
+
+    /* PROVIDER CARDS */
+    .provider-card {
+      background:var(--bg2); border:1px solid var(--border);
+      border-radius:12px; padding:24px; margin-bottom:20px;
+      transition:border-color 0.2s;
+    }
+    .provider-card:hover { border-color:var(--accent); }
+    .provider-header { display:flex; align-items:center; gap:14px; margin-bottom:16px; flex-wrap:wrap; }
+    .provider-logo { font-size:2rem; }
+    .provider-name { font-size:1.15rem; color:#fff; font-weight:700; }
+    .provider-sub { font-size:0.8rem; color:var(--muted); margin-top:2px; }
+    .provider-tags { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+
+    .price-row { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; margin:14px 0; }
+    .price-box { background:var(--bg3); border-radius:8px; padding:12px; text-align:center; }
+    .price-val { font-size:1.3rem; font-weight:700; color:var(--green); }
+    .price-val.expensive { color:var(--orange); }
+    .price-label { font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.4px; margin-top:3px; }
+
+    .pros-cons { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0; }
+    .pros, .cons { background:var(--bg3); border-radius:8px; padding:14px; }
+    .pros h5 { color:var(--green); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+    .cons h5 { color:var(--red); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+    .pros li, .cons li { font-size:0.82rem; color:#c9d1d9; margin-bottom:4px; }
+
+    /* CALLOUT */
+    .callout { border-radius:8px; padding:14px 18px; margin:16px 0; font-size:0.88rem; display:flex; gap:10px; }
+    .callout.info { background:rgba(88,166,255,0.08); border:1px solid rgba(88,166,255,0.2); }
+    .callout.warn { background:rgba(210,153,34,0.08); border:1px solid rgba(210,153,34,0.2); }
+    .callout.success { background:rgba(63,185,80,0.08); border:1px solid rgba(63,185,80,0.2); }
+    .callout.danger { background:rgba(248,81,73,0.08); border:1px solid rgba(248,81,73,0.2); }
+    .callout p { margin:0; color:#c9d1d9; }
+
+    /* TABLE */
+    .tbl { width:100%; border-collapse:collapse; margin:14px 0; font-size:0.83rem; }
+    .tbl th { background:var(--bg3); color:var(--muted); padding:9px 12px; text-align:left; border-bottom:1px solid var(--border); font-weight:500; }
+    .tbl td { padding:9px 12px; border-bottom:1px solid var(--bg3); color:#c9d1d9; }
+    .tbl tr:hover td { background:var(--bg2); }
+
+    /* SCENARIO CARDS */
+    .scenario-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; margin:16px 0; }
+    .scenario-card { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:18px; }
+    .scenario-card .sc-title { font-size:0.75rem; text-transform:uppercase; letter-spacing:0.8px; color:var(--accent); margin-bottom:8px; }
+    .scenario-card h4 { color:var(--text); font-size:0.95rem; margin:0 0 8px; }
+    .scenario-card p { font-size:0.82rem; color:var(--muted); margin:0; }
+    .scenario-card .sc-winner { margin-top:10px; font-size:0.8rem; color:var(--green); font-weight:600; }
+
+    footer { background:var(--bg2); border-top:1px solid var(--border); text-align:center; padding:18px; font-size:0.78rem; color:var(--muted); }
+
+    @media(max-width:600px) {
+      .pros-cons { grid-template-columns:1fr; }
+      .price-row { grid-template-columns:repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">💶 Confronto prezzi reali 2026</div>
+  <h1>Fornitori Magliette — <span>Chi Costa Meno?</span></h1>
+  <div class="hero-sub">Confronto completo: PoD, stampa locale, stock+stampa — prezzi reali per il mercato italiano</div>
+</div>
+
+<nav>
+  <button class="ntab active" onclick="showTab('panoramica')">📊 Panoramica</button>
+  <button class="ntab" onclick="showTab('pod')">☁️ Print-on-Demand</button>
+  <button class="ntab" onclick="showTab('italiani')">🇮🇹 Fornitori IT</button>
+  <button class="ntab" onclick="showTab('stock')">📦 Stock + Stampa</button>
+  <button class="ntab" onclick="showTab('confronto')">⚖️ Confronto finale</button>
+  <button class="ntab" onclick="showTab('consiglio')">🎯 Consiglio</button>
+</nav>
+
+<div class="container">
+
+<!-- PANORAMICA -->
+<section id="panoramica" class="active">
+  <h2>📊 Panoramica — I 3 modelli possibili</h2>
+  <p class="sec-desc">Esistono tre approcci completamente diversi per produrre e vendere magliette. Ognuno ha una struttura di costi radicalmente differente.</p>
+
+  <div class="scenario-grid">
+    <div class="scenario-card">
+      <div class="sc-title">Modello 1</div>
+      <h4>☁️ Print-on-Demand (PoD)</h4>
+      <p>Il fornitore stampa e spedisce per te su ogni singolo ordine. Zero stock, zero rischio. Costo per pezzo alto.</p>
+      <div class="sc-winner">Costo maglietta: €11–16 | Margine: €8–14</div>
+    </div>
+    <div class="scenario-card">
+      <div class="sc-title">Modello 2</div>
+      <h4>🏭 Stock + Stampatore locale</h4>
+      <p>Compri le magliette blank all'ingrosso, le porti a uno stampatore locale. Costo basso, ma devi gestire il magazzino.</p>
+      <div class="sc-winner">Costo maglietta: €5–8 | Margine: €17–22</div>
+    </div>
+    <div class="scenario-card">
+      <div class="sc-title">Modello 3</div>
+      <h4>🔀 Ibrido</h4>
+      <p>PoD per i design nuovi da testare, stock per i best seller. Il migliore per scalare in modo intelligente.</p>
+      <div class="sc-winner">Costo medio: €7–12 | Margine: €12–20</div>
+    </div>
+  </div>
+
+  <h3>💡 La verità sui margini</h3>
+  <table class="tbl">
+    <tr><th>Modello</th><th>Costo produzione</th><th>Prezzo vendita</th><th>Margine lordo</th><th>Margine netto (post-tax/ads)</th></tr>
+    <tr><td>PoD Printful</td><td>€13,00</td><td>€29,90</td><td>€16,90 (56%)</td><td>~€7–9 (25%)</td></tr>
+    <tr><td>PoD Gelato</td><td>€10,50</td><td>€29,90</td><td>€19,40 (65%)</td><td>~€9–11 (32%)</td></tr>
+    <tr><td>PoD Printify</td><td>€9,50</td><td>€29,90</td><td>€20,40 (68%)</td><td>~€10–12 (35%)</td></tr>
+    <tr><td>Stock + locale</td><td>€6,50</td><td>€29,90</td><td>€23,40 (78%)</td><td>~€14–16 (48%)</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <span>⚠️</span>
+    <p><strong>Printful è il più costoso del mercato PoD</strong> — ma è anche il più affidabile e semplice da integrare. Paghi per la comodità. Se il volume cresce, cambiare fornitore aumenta il margine di €3–5 per pezzo = +€3.000/mese su 1.000 ordini.</p>
+  </div>
+</section>
+
+<!-- PRINT ON DEMAND -->
+<section id="pod">
+  <h2>☁️ Print-on-Demand — Confronto dettagliato</h2>
+  <p class="sec-desc">Prezzi verificati aprile–luglio 2026 per maglietta Bella+Canvas 3001 (taglia M, stampa fronte, spedizione UE)</p>
+
+  <!-- PRINTFUL -->
+  <div class="provider-card">
+    <div class="provider-header">
+      <div class="provider-logo">🖨️</div>
+      <div>
+        <div class="provider-name">Printful <span class="badge o">Il più costoso</span></div>
+        <div class="provider-sub">USA/EU · Magazzini propri · Qualità costante</div>
+        <div class="provider-tags">
+          <span class="badge b">Shopify ✓</span>
+          <span class="badge b">Etsy ✓</span>
+          <span class="badge b">WooCommerce ✓</span>
+        </div>
+      </div>
+    </div>
+    <div class="price-row">
+      <div class="price-box"><div class="price-val expensive">€11,70</div><div class="price-label">Bella+Canvas 3001</div></div>
+      <div class="price-box"><div class="price-val expensive">€3,50</div><div class="price-label">Spedizione IT</div></div>
+      <div class="price-box"><div class="price-val expensive">€15,20</div><div class="price-label">Totale per ordine</div></div>
+      <div class="price-box"><div class="price-val expensive">€14,60</div><div class="price-label">Margine (su €29,90)</div></div>
+    </div>
+    <div class="pros-cons">
+      <div class="pros">
+        <h5>✅ Pro</h5>
+        <ul>
+          <li>Qualità stampa eccellente e costante</li>
+          <li>Magazzino EU (Lettonia) = spedizioni rapide</li>
+          <li>API robusta, documentazione ottima</li>
+          <li>Nessuna sorpresa su qualità provider</li>
+          <li>Brand packaging (etichette custom)</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h5>❌ Contro</h5>
+        <ul>
+          <li>Il più caro del mercato PoD</li>
+          <li>Nessuna scelta del provider</li>
+          <li>Piano Growth richiede €24,99/mese</li>
+          <li>Margini stretti su prezzi competitivi</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- GELATO -->
+  <div class="provider-card" style="border-color:rgba(63,185,80,0.3);">
+    <div class="provider-header">
+      <div class="provider-logo">🌍</div>
+      <div>
+        <div class="provider-name">Gelato <span class="winner">⭐ Miglior rapporto qualità/prezzo EU</span></div>
+        <div class="provider-sub">Network globale · Stampatori locali EU · Spedizioni rapide</div>
+        <div class="provider-tags">
+          <span class="badge b">Shopify ✓</span>
+          <span class="badge b">Etsy ✓</span>
+          <span class="badge g">Stampatori IT ✓</span>
+        </div>
+      </div>
+    </div>
+    <div class="price-row">
+      <div class="price-box"><div class="price-val">€9,50</div><div class="price-label">Bella+Canvas 3001</div></div>
+      <div class="price-box"><div class="price-val">€3,20</div><div class="price-label">Spedizione IT</div></div>
+      <div class="price-box"><div class="price-val">€12,70</div><div class="price-label">Totale per ordine</div></div>
+      <div class="price-box"><div class="price-val">€17,20</div><div class="price-label">Margine (su €29,90)</div></div>
+    </div>
+    <div class="pros-cons">
+      <div class="pros">
+        <h5>✅ Pro</h5>
+        <ul>
+          <li><strong>Stampatori locali in Italia</strong> = spedizione 2–3gg</li>
+          <li>Prezzi ~20% più bassi di Printful</li>
+          <li>Piano gratuito con tutte le funzioni</li>
+          <li>Ottima integrazione Shopify/Etsy</li>
+          <li>Sostenibilità: carbon neutral shipping</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h5>❌ Contro</h5>
+        <ul>
+          <li>Qualità variabile (dipende dallo stampatore locale)</li>
+          <li>Catalogo prodotti leggermente più limitato</li>
+          <li>Meno documentazione API vs Printful</li>
+        </ul>
+      </div>
+    </div>
+    <a href="https://gelato.com" target="_blank" style="font-size:0.82rem;">→ gelato.com</a>
+  </div>
+
+  <!-- PRINTIFY -->
+  <div class="provider-card">
+    <div class="provider-header">
+      <div class="provider-logo">🏪</div>
+      <div>
+        <div class="provider-name">Printify <span class="badge g">Più economico in assoluto</span></div>
+        <div class="provider-sub">Marketplace di stampatori · Scegli il provider · Prezzi variabili</div>
+        <div class="provider-tags">
+          <span class="badge b">Shopify ✓</span>
+          <span class="badge b">Etsy ✓</span>
+          <span class="badge o">Provider EU limitati</span>
+        </div>
+      </div>
+    </div>
+    <div class="price-row">
+      <div class="price-box"><div class="price-val">€8,50–11</div><div class="price-label">Bella+Canvas 3001</div></div>
+      <div class="price-box"><div class="price-val">€3,50–5</div><div class="price-label">Spedizione IT</div></div>
+      <div class="price-box"><div class="price-val">€13–16</div><div class="price-label">Totale per ordine</div></div>
+      <div class="price-box"><div class="price-val">€14–17</div><div class="price-label">Margine (su €29,90)</div></div>
+    </div>
+    <div class="pros-cons">
+      <div class="pros">
+        <h5>✅ Pro</h5>
+        <ul>
+          <li>Prezzi più bassi del mercato PoD</li>
+          <li>Puoi scegliere il provider migliore per ogni prodotto</li>
+          <li>Piano Premium ($29/mese) = -20% su tutto</li>
+          <li>Enorme catalogo prodotti</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h5>❌ Contro</h5>
+        <ul>
+          <li>Provider EU per Italia limitati → spedizioni lente da UK/USA</li>
+          <li>Qualità inconsistente tra provider diversi</li>
+          <li>Devi testare ogni provider singolarmente</li>
+          <li>Prezzi più bassi = provider spesso fuori UE</li>
+        </ul>
+      </div>
+    </div>
+    <a href="https://printify.com" target="_blank" style="font-size:0.82rem;">→ printify.com</a>
+  </div>
+
+  <!-- SPOD -->
+  <div class="provider-card">
+    <div class="provider-header">
+      <div class="provider-logo">⚡</div>
+      <div>
+        <div class="provider-name">SPOD (Spreadshirt) <span class="badge b">Più veloce EU</span></div>
+        <div class="provider-sub">Germania · Produzione 48h · Magazzino EU</div>
+        <div class="provider-tags">
+          <span class="badge b">Shopify ✓</span>
+          <span class="badge b">WooCommerce ✓</span>
+          <span class="badge g">48h produzione</span>
+        </div>
+      </div>
+    </div>
+    <div class="price-row">
+      <div class="price-box"><div class="price-val">€8,00</div><div class="price-label">T-shirt base</div></div>
+      <div class="price-box"><div class="price-val">€3,00</div><div class="price-label">Spedizione IT</div></div>
+      <div class="price-box"><div class="price-val">€11,00</div><div class="price-label">Totale per ordine</div></div>
+      <div class="price-box"><div class="price-val">€18,90</div><div class="price-label">Margine (su €29,90)</div></div>
+    </div>
+    <div class="pros-cons">
+      <div class="pros">
+        <h5>✅ Pro</h5>
+        <ul>
+          <li>Produzione in 48h — il più veloce EU</li>
+          <li>Prezzi competitivi, magazzino Germania</li>
+          <li>Stampa digitale di qualità</li>
+          <li>Integrazione Shopify solida</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h5>❌ Contro</h5>
+        <ul>
+          <li>Catalogo blank limitato (magliette Spreadshirt)</li>
+          <li>Meno premium di Bella+Canvas</li>
+          <li>Meno conosciuto dai seller italiani</li>
+        </ul>
+      </div>
+    </div>
+    <a href="https://spod.com" target="_blank" style="font-size:0.82rem;">→ spod.com</a>
+  </div>
+</section>
+
+<!-- FORNITORI ITALIANI -->
+<section id="italiani">
+  <h2>🇮🇹 Fornitori Italiani — PoD e Grossisti</h2>
+  <p class="sec-desc">Alternative made-in-Italy per tempi di consegna rapidi, supporto in italiano e nessun problema doganale</p>
+
+  <!-- HOPLIX -->
+  <div class="provider-card" style="border-color:rgba(88,166,255,0.3);">
+    <div class="provider-header">
+      <div class="provider-logo">🇮🇹</div>
+      <div>
+        <div class="provider-name">Hoplix <span class="winner">⭐ Miglior PoD Italiano</span></div>
+        <div class="provider-sub">Milano · Print-on-Demand italiano · Integrazione Shopify/Amazon</div>
+        <div class="provider-tags">
+          <span class="badge b">Shopify ✓</span>
+          <span class="badge b">Amazon ✓</span>
+          <span class="badge g">Made in Italy ✓</span>
+          <span class="badge g">Eco-certified ✓</span>
+        </div>
+      </div>
+    </div>
+    <div class="price-row">
+      <div class="price-box"><div class="price-val">€10,50</div><div class="price-label">T-shirt unisex</div></div>
+      <div class="price-box"><div class="price-val">€2,90</div><div class="price-label">Spedizione Italia</div></div>
+      <div class="price-box"><div class="price-val">€13,40</div><div class="price-label">Totale per ordine</div></div>
+      <div class="price-box"><div class="price-val">€16,50</div><div class="price-label">Margine (su €29,90)</div></div>
+    </div>
+    <div class="pros-cons">
+      <div class="pros">
+        <h5>✅ Pro</h5>
+        <ul>
+          <li><strong>Tutto in Italia</strong>: fatturazione IT, supporto IT, IVA gestita</li>
+          <li>Spedizione Italia 2–4 gg lavorativi</li>
+          <li>Stampa DTG eco-certificata (inchiostri acqua)</li>
+          <li>Integrazione Amazon oltre a Shopify</li>
+          <li>Nessuna complicazione valutaria (€ su €)</li>
+          <li>Ottimo per chi vende prevalentemente in Italia</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h5>❌ Contro</h5>
+        <ul>
+          <li>Catalogo blank più limitato (no Bella+Canvas)</li>
+          <li>Meno adatto per vendite internazionali EU</li>
+          <li>API meno avanzata di Printful/Gelato</li>
+        </ul>
+      </div>
+    </div>
+    <a href="https://hoplix.com" target="_blank" style="font-size:0.82rem;">→ hoplix.com</a>
+  </div>
+
+  <!-- WORDANS -->
+  <div class="provider-card">
+    <div class="provider-header">
+      <div class="provider-logo">📦</div>
+      <div>
+        <div class="provider-name">Wordans Italia <span class="badge g">Grossista blank</span></div>
+        <div class="provider-sub">Ingrosso abbigliamento blank · Gildan, Fruit of the Loom, B&C · Consegna 48–72h</div>
+      </div>
+    </div>
+    <div class="price-row">
+      <div class="price-box"><div class="price-val">€2,50</div><div class="price-label">Gildan 64000 (x50+)</div></div>
+      <div class="price-box"><div class="price-val">€4,50</div><div class="price-label">Fruit of the Loom</div></div>
+      <div class="price-box"><div class="price-val">€7,50</div><div class="price-label">Stanley/Stella (x10+)</div></div>
+      <div class="price-box"><div class="price-val">€0</div><div class="price-label">Spedizione gratuita da €69</div></div>
+    </div>
+    <p style="font-size:0.84rem; color:var(--muted); margin-top:8px;">Da usare <strong>solo con modello Stock + Stampatore locale</strong>. Prezzi vantaggiosissimi ma richiede gestione magazzino e rapporto con uno stampatore esterno.</p>
+    <a href="https://www.wordans.it" target="_blank" style="font-size:0.82rem;">→ wordans.it</a>
+  </div>
+
+  <!-- TEEFACTORY -->
+  <div class="provider-card">
+    <div class="provider-header">
+      <div class="provider-logo">🏭</div>
+      <div>
+        <div class="provider-name">Teefactory.it <span class="badge b">B2B personalizzato</span></div>
+        <div class="provider-sub">Fornitore B2B · Abbigliamento personalizzato su ordinazione · Minimo 10 pz</div>
+      </div>
+    </div>
+    <div class="price-row">
+      <div class="price-box"><div class="price-val">€6,00</div><div class="price-label">T-shirt (x10 pz)</div></div>
+      <div class="price-box"><div class="price-val">€4,50</div><div class="price-label">T-shirt (x50 pz)</div></div>
+      <div class="price-box"><div class="price-val">€3,50</div><div class="price-label">T-shirt (x100 pz)</div></div>
+      <div class="price-box"><div class="price-val">~1 sett</div><div class="price-label">Tempi consegna</div></div>
+    </div>
+    <p style="font-size:0.84rem; color:var(--muted); margin-top:8px;">Ottimo per ordini B2B (eventi, associazioni, aziende). Non adatto per PoD singolo. Serigrafia o DTG su richiesta.</p>
+    <a href="https://teefactory.it" target="_blank" style="font-size:0.82rem;">→ teefactory.it</a>
+  </div>
+</section>
+
+<!-- STOCK + STAMPA LOCALE -->
+<section id="stock">
+  <h2>📦 Modello Stock + Stampatore Locale</h2>
+  <p class="sec-desc">Il modello più economico in assoluto — margini doppi rispetto al PoD. Richiede però gestione magazzino e un partner per la stampa.</p>
+
+  <div class="callout success">
+    <span>💡</span>
+    <p><strong>Quando conviene davvero:</strong> hai 3–5 design che vendono costantemente 50+ pezzi/mese ciascuno. A quel punto comprare in stock + stampare in batch abbatte il costo da €13 a €5–7 per maglietta. Su 500 pezzi/mese = €3.000 di risparmio mensile.</p>
+  </div>
+
+  <h3>📐 Come funziona il modello</h3>
+  <table class="tbl">
+    <tr><th>Fase</th><th>Azione</th><th>Fornitore consigliato</th><th>Costo</th></tr>
+    <tr><td>1. Acquisto blank</td><td>Compri magliette neutre all'ingrosso</td><td>Wordans.it, Teefactory.it</td><td>€2,50–5 /pz (x50+)</td></tr>
+    <tr><td>2. Stampa DTG</td><td>Porti da stampatore locale con DTG</td><td>Tipografia locale, CustomStore.it</td><td>€2–4 /pz</td></tr>
+    <tr><td>3. Gestione stock</td><td>Stocci in casa o box self-storage</td><td>Box self-storage locale</td><td>€30–80/mese</td></tr>
+    <tr><td>4. Spedizione</td><td>Spedisci tu con corriere</td><td>BRT, GLS, Poste (da Shopify)</td><td>€3–5 /pz</td></tr>
+    <tr><td colspan="3"><strong>Costo totale per maglietta</strong></td><td><strong>€7,50–14</strong></td></tr>
+  </table>
+
+  <h3>🔍 Come trovare uno stampatore DTG locale</h3>
+  <div class="callout info">
+    <span>🔍</span>
+    <p>Cerca su Google: <code>"stampa DTG [tua città]"</code> o <code>"stampa digitale magliette [tua città]"</code>. Richiedi preventivo per 50 pezzi. Prezzo di riferimento: €2,50–4,00 a pezzo su 50+ pezzi con design a 1 colore. La serigrafia è più economica per quantità elevate (100+) ma richiede minimo di colori.</p>
+  </div>
+
+  <h3>📊 Confronto tecniche di stampa</h3>
+  <table class="tbl">
+    <tr><th>Tecnica</th><th>Qualità</th><th>Costo (50 pz)</th><th>Minimo</th><th>Ideale per</th></tr>
+    <tr><td><strong>DTG (Direct to Garment)</strong></td><td>⭐⭐⭐⭐</td><td>€2,50–4/pz</td><td>1 pz</td><td>Design multicolore, volumi medi</td></tr>
+    <tr><td><strong>Serigrafia</strong></td><td>⭐⭐⭐⭐⭐</td><td>€1,50–2,50/pz</td><td>50–100 pz</td><td>Design semplici, grandi volumi</td></tr>
+    <tr><td><strong>Transfer termico</strong></td><td>⭐⭐⭐</td><td>€1,50–3/pz</td><td>1 pz</td><td>Piccole quantità, bassa durata</td></tr>
+    <tr><td><strong>Ricamo</strong></td><td>⭐⭐⭐⭐⭐</td><td>€3–6/pz</td><td>12 pz</td><td>Design premium, logo aziendale</td></tr>
+    <tr><td><strong>Sublimazione</strong></td><td>⭐⭐⭐⭐</td><td>€2–4/pz</td><td>1 pz</td><td>Solo magliette bianche/chiare 100% poliestere</td></tr>
+  </table>
+
+  <h3>⚙️ Automatizzare il modello stock con le tue skills dev</h3>
+  <ul>
+    <li>Usa <strong>Shopify + EasyPost API</strong> per generare etichette di spedizione automaticamente</li>
+    <li>Crea dashboard inventario con <strong>Google Sheets API</strong> per monitorare stock rimanente</li>
+    <li>Webhook Shopify → notifica Telegram quando un ordine arriva → stampa etichetta in un click</li>
+    <li>Soglia automatica: quando stock scende sotto X unità → alert per riordino</li>
+  </ul>
+</section>
+
+<!-- CONFRONTO FINALE -->
+<section id="confronto">
+  <h2>⚖️ Confronto Finale — Tutti i Fornitori</h2>
+  <p class="sec-desc">Maglietta Bella+Canvas 3001 taglia M, stampa fronte, spedizione Italia. Prezzi luglio 2026.</p>
+
+  <table class="tbl">
+    <tr>
+      <th>Fornitore</th>
+      <th>Costo blank</th>
+      <th>Spedizione IT</th>
+      <th>Totale</th>
+      <th>Margine (€29,90)</th>
+      <th>Tipo</th>
+      <th>Voto</th>
+    </tr>
+    <tr>
+      <td><strong>SPOD</strong></td>
+      <td>€8,00</td>
+      <td>€3,00</td>
+      <td><strong>€11,00</strong></td>
+      <td><span class="badge g">€18,90 (63%)</span></td>
+      <td>PoD EU</td>
+      <td>⭐⭐⭐⭐</td>
+    </tr>
+    <tr>
+      <td><strong>Printify</strong> (provider EU)</td>
+      <td>€8,50–11</td>
+      <td>€3,50–5</td>
+      <td><strong>€13–16</strong></td>
+      <td><span class="badge g">€14–17 (47–57%)</span></td>
+      <td>PoD marketplace</td>
+      <td>⭐⭐⭐⭐</td>
+    </tr>
+    <tr>
+      <td><strong>Gelato</strong></td>
+      <td>€9,50</td>
+      <td>€3,20</td>
+      <td><strong>€12,70</strong></td>
+      <td><span class="badge g">€17,20 (57%)</span></td>
+      <td>PoD EU locale</td>
+      <td>⭐⭐⭐⭐⭐</td>
+    </tr>
+    <tr>
+      <td><strong>Hoplix</strong></td>
+      <td>€10,50</td>
+      <td>€2,90</td>
+      <td><strong>€13,40</strong></td>
+      <td><span class="badge g">€16,50 (55%)</span></td>
+      <td>PoD Italiano</td>
+      <td>⭐⭐⭐⭐</td>
+    </tr>
+    <tr style="background:rgba(248,81,73,0.05);">
+      <td><strong>Printful</strong></td>
+      <td>€11,70</td>
+      <td>€3,50</td>
+      <td><strong>€15,20</strong></td>
+      <td><span class="badge o">€14,70 (49%)</span></td>
+      <td>PoD premium</td>
+      <td>⭐⭐⭐</td>
+    </tr>
+    <tr style="background:rgba(63,185,80,0.05);">
+      <td><strong>Stock + DTG locale</strong></td>
+      <td>€3–5 (Wordans)</td>
+      <td>€4,50 (BRT)</td>
+      <td><strong>€9,50–11</strong></td>
+      <td><span class="badge g">€19–20 (63–67%)</span></td>
+      <td>Stock / batch</td>
+      <td>⭐⭐⭐⭐⭐</td>
+    </tr>
+  </table>
+
+  <div class="callout danger">
+    <span>🚨</span>
+    <p><strong>Risparmio reale su Printful:</strong> passando da Printful a Gelato risparmi <strong>€2,50 per ordine</strong>. Su 500 ordini/mese = <strong>€1.250/mese in più</strong> senza fare nulla. Su 1.000 ordini = €2.500/mese. Il cambio fornitore è la leva più potente sui margini.</p>
+  </div>
+</section>
+
+<!-- CONSIGLIO FINALE -->
+<section id="consiglio">
+  <h2>🎯 Il Consiglio — Cosa fare in base alla fase</h2>
+  <p class="sec-desc">La scelta del fornitore dipende dalla fase del tuo business. Ecco la strategia ottimale per ogni momento.</p>
+
+  <div class="scenario-grid">
+    <div class="scenario-card" style="border-color:rgba(88,166,255,0.3);">
+      <div class="sc-title">📅 Mese 0–3 (validazione)</div>
+      <h4>Usa Printful o Hoplix</h4>
+      <p>Priorità = semplicità e affidabilità. Stai validando la nicchia, non ottimizzando i margini. Printful ha la migliore integrazione Etsy e la qualità più costante.</p>
+      <div class="sc-winner">Scegli: Printful (globale) o Hoplix (solo IT)</div>
+    </div>
+    <div class="scenario-card" style="border-color:rgba(63,185,80,0.3);">
+      <div class="sc-title">📅 Mese 3–6 (crescita)</div>
+      <h4>Migra a Gelato o SPOD</h4>
+      <p>Hai validato la nicchia, ora ottimizzi i margini. Gelato offre il miglior equilibrio qualità/prezzo con stampatori locali italiani e spedizioni EU veloci.</p>
+      <div class="sc-winner">Scegli: Gelato ⭐ (consigliato) o SPOD</div>
+    </div>
+    <div class="scenario-card" style="border-color:rgba(210,153,34,0.3);">
+      <div class="sc-title">📅 Mese 6+ (scalabilità)</div>
+      <h4>Modello Ibrido</h4>
+      <p>Design nuovi → PoD (Gelato). Best seller con 50+ ordini/mese → Stock (Wordans) + stampatore locale DTG. Massimizza i margini dove conta.</p>
+      <div class="sc-winner">Scegli: Gelato PoD + Wordans stock</div>
+    </div>
+  </div>
+
+  <h3>💰 Simulazione risparmio mensile vs Printful</h3>
+  <table class="tbl">
+    <tr><th>Volume mensile</th><th>Con Printful</th><th>Con Gelato</th><th>Con Stock+DTG</th><th>Risparmio max</th></tr>
+    <tr><td>50 ordini/mese</td><td>€760 costi prod.</td><td>€635</td><td>€475</td><td><span class="badge g">+€285/mese</span></td></tr>
+    <tr><td>200 ordini/mese</td><td>€3.040</td><td>€2.540</td><td>€1.900</td><td><span class="badge g">+€1.140/mese</span></td></tr>
+    <tr><td>500 ordini/mese</td><td>€7.600</td><td>€6.350</td><td>€4.750</td><td><span class="badge g">+€2.850/mese</span></td></tr>
+    <tr><td>1.000 ordini/mese</td><td>€15.200</td><td>€12.700</td><td>€9.500</td><td><span class="badge g">+€5.700/mese</span></td></tr>
+  </table>
+
+  <div class="callout success">
+    <span>🚀</span>
+    <p><strong>Conclusione:</strong> inizia con <strong>Hoplix</strong> (se vendi solo in Italia) o <strong>Printful</strong> (se vendi in UE). Dopo le prime 50 vendite migra a <strong>Gelato</strong> per risparmiare €2–3 per ordine. Quando un design supera 50 pezzi/mese, valuta il <strong>modello stock+stampa locale</strong> per quei prodotti specifici.</p>
+  </div>
+
+  <div style="text-align:center; margin-top:28px; padding:24px; background:var(--bg2); border:1px solid var(--border); border-radius:12px;">
+    <h3 style="color:var(--green); margin:0 0 16px;">🔗 Link diretti ai fornitori</h3>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+      <a href="https://hoplix.com" target="_blank" style="background:var(--bg3); border:1px solid var(--border); border-radius:6px; padding:8px 16px; font-size:0.82rem; color:var(--accent); text-decoration:none;">🇮🇹 Hoplix</a>
+      <a href="https://gelato.com" target="_blank" style="background:var(--bg3); border:1px solid var(--border); border-radius:6px; padding:8px 16px; font-size:0.82rem; color:var(--accent); text-decoration:none;">🌍 Gelato</a>
+      <a href="https://spod.com" target="_blank" style="background:var(--bg3); border:1px solid var(--border); border-radius:6px; padding:8px 16px; font-size:0.82rem; color:var(--accent); text-decoration:none;">⚡ SPOD</a>
+      <a href="https://printify.com" target="_blank" style="background:var(--bg3); border:1px solid var(--border); border-radius:6px; padding:8px 16px; font-size:0.82rem; color:var(--accent); text-decoration:none;">🏪 Printify</a>
+      <a href="https://wordans.it" target="_blank" style="background:var(--bg3); border:1px solid var(--border); border-radius:6px; padding:8px 16px; font-size:0.82rem; color:var(--accent); text-decoration:none;">📦 Wordans</a>
+      <a href="https://printful.com" target="_blank" style="background:var(--bg3); border:1px solid var(--border); border-radius:6px; padding:8px 16px; font-size:0.82rem; color:var(--accent); text-decoration:none;">🖨️ Printful</a>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  Guida Fornitori 2026 · Dario Schioppi ·
+  <a href="index.html">📊 Business Plan</a> ·
+  <a href="guida-prima-vendita.html">📋 Guida Prima Vendita</a>
+</footer>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.ntab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+</script>
+</body>
+</html>
