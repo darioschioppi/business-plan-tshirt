@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Guida: Prima Maglietta Venduta — From Scratch</title>
+  <style>
+    :root {
+      --bg: #0f1117; --bg2: #161b22; --bg3: #1c2128;
+      --border: #30363d; --text: #e6edf3; --muted: #8b949e;
+      --accent: #58a6ff; --green: #3fb950; --red: #f85149;
+      --orange: #d29922; --purple: #bc8cff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, 'Segoe UI', sans-serif; line-height: 1.75; }
+    a { color: var(--accent); }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, #0d1117, #161b22, #1a2332);
+      border-bottom: 1px solid var(--border);
+      padding: 56px 24px 44px; text-align: center;
+    }
+    .hero-badge {
+      display: inline-block; background: rgba(63,185,80,0.1);
+      border: 1px solid rgba(63,185,80,0.3); border-radius: 20px;
+      padding: 4px 16px; font-size: 0.76rem; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--green); margin-bottom: 18px;
+    }
+    .hero h1 { font-size: clamp(1.7rem,4vw,2.6rem); color:#fff; margin-bottom:10px; }
+    .hero h1 span { color: var(--green); }
+    .hero-sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 24px; }
+    .hero-stats { display:flex; justify-content:center; gap:32px; flex-wrap:wrap; }
+    .stat { text-align:center; }
+    .stat-val { font-size:1.5rem; font-weight:700; color:var(--green); }
+    .stat-label { font-size:0.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; }
+
+    /* NAV PROGRESS */
+    .progress-nav {
+      position:sticky; top:0; z-index:100;
+      background:rgba(15,17,23,0.97); backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--border); padding:0 16px;
+      overflow-x:auto; display:flex; gap:0; scrollbar-width:none;
+    }
+    .progress-nav::-webkit-scrollbar { display:none; }
+    .pnav-item {
+      display:flex; align-items:center; gap:8px; white-space:nowrap;
+      padding:12px 16px; cursor:pointer; color:var(--muted);
+      font-size:0.8rem; border-bottom:2px solid transparent;
+      transition:all 0.2s; background:none; border-top:none;
+      border-left:none; border-right:none; font-family:inherit;
+    }
+    .pnav-item:hover { color:var(--text); }
+    .pnav-item.active { color:var(--green); border-bottom-color:var(--green); }
+    .pnav-item .step-num {
+      width:20px; height:20px; border-radius:50%;
+      background:var(--bg3); border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      font-size:0.68rem; font-weight:700; flex-shrink:0;
+    }
+    .pnav-item.active .step-num { background:var(--green); border-color:var(--green); color:#000; }
+    .pnav-item.done .step-num { background:rgba(63,185,80,0.2); border-color:var(--green); color:var(--green); }
+
+    /* LAYOUT */
+    .container { max-width:860px; margin:0 auto; padding:40px 20px; }
+    .step-section { display:none; }
+    .step-section.active { display:block; }
+
+    /* STEP HEADER */
+    .step-header {
+      display:flex; align-items:flex-start; gap:20px;
+      background:var(--bg2); border:1px solid var(--border);
+      border-radius:12px; padding:24px; margin-bottom:28px;
+    }
+    .step-badge {
+      background:var(--green); color:#000; font-weight:700;
+      font-size:1.1rem; width:48px; height:48px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    }
+    .step-info h2 { font-size:1.4rem; color:#fff; margin-bottom:4px; }
+    .step-info .step-meta { display:flex; gap:12px; flex-wrap:wrap; margin-top:8px; }
+    .step-tag {
+      background:var(--bg3); border:1px solid var(--border);
+      border-radius:4px; padding:2px 10px; font-size:0.74rem; color:var(--muted);
+    }
+    .step-tag.time { color:var(--orange); border-color:rgba(210,153,34,0.3); background:rgba(210,153,34,0.08); }
+    .step-tag.cost { color:var(--green); border-color:rgba(63,185,80,0.3); background:rgba(63,185,80,0.08); }
+    .step-tag.diff { color:var(--accent); border-color:rgba(88,166,255,0.3); background:rgba(88,166,255,0.08); }
+
+    /* TASK LIST */
+    .task-list { margin:20px 0; }
+    .task {
+      display:flex; gap:14px; align-items:flex-start;
+      background:var(--bg2); border:1px solid var(--border);
+      border-radius:8px; padding:16px; margin-bottom:10px;
+      transition:border-color 0.2s;
+    }
+    .task:hover { border-color:var(--green); }
+    .task-check {
+      width:22px; height:22px; border:2px solid var(--border);
+      border-radius:4px; flex-shrink:0; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      font-size:0.8rem; transition:all 0.2s; margin-top:2px;
+    }
+    .task-check:hover { border-color:var(--green); }
+    .task.checked { opacity:0.6; }
+    .task.checked .task-check { background:var(--green); border-color:var(--green); color:#000; }
+    .task-body h4 { font-size:0.95rem; color:var(--text); margin:0 0 4px; }
+    .task-body p { font-size:0.85rem; color:var(--muted); margin:0; }
+    .task-body code { background:var(--bg3); padding:1px 6px; border-radius:3px; font-size:0.8rem; color:#79c0ff; }
+    .task-body a { font-size:0.85rem; }
+
+    /* CALLOUTS */
+    .callout { border-radius:8px; padding:14px 18px; margin:16px 0; font-size:0.88rem; display:flex; gap:10px; }
+    .callout.info { background:rgba(88,166,255,0.08); border:1px solid rgba(88,166,255,0.2); }
+    .callout.warn { background:rgba(210,153,34,0.08); border:1px solid rgba(210,153,34,0.2); }
+    .callout.danger { background:rgba(248,81,73,0.08); border:1px solid rgba(248,81,73,0.2); }
+    .callout.success { background:rgba(63,185,80,0.08); border:1px solid rgba(63,185,80,0.2); }
+    .callout p { margin:0; color:#c9d1d9; }
+
+    /* TOOL CARDS */
+    .tool-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; margin:16px 0; }
+    .tool-card {
+      background:var(--bg2); border:1px solid var(--border);
+      border-radius:8px; padding:16px; text-decoration:none;
+    }
+    .tool-card:hover { border-color:var(--accent); text-decoration:none; }
+    .tool-card .tool-icon { font-size:1.5rem; margin-bottom:8px; }
+    .tool-card h5 { color:var(--text); font-size:0.9rem; margin:0 0 4px; }
+    .tool-card p { color:var(--muted); font-size:0.78rem; margin:0; }
+    .tool-card .tool-cost { color:var(--green); font-size:0.75rem; margin-top:6px; font-weight:600; }
+
+    /* CODE BLOCK */
+    .code-block {
+      background:var(--bg3); border:1px solid var(--border);
+      border-radius:8px; padding:16px; margin:16px 0;
+      font-family:'Fira Code', monospace; font-size:0.82rem;
+      color:#79c0ff; overflow-x:auto; white-space:pre;
+    }
+
+    /* TABLE */
+    .tbl { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.86rem; }
+    .tbl th { background:var(--bg3); color:var(--muted); padding:10px 12px; text-align:left; border-bottom:1px solid var(--border); font-weight:500; }
+    .tbl td { padding:9px 12px; border-bottom:1px solid var(--bg3); color:#c9d1d9; }
+    .tbl tr:hover td { background:var(--bg2); }
+
+    /* NAV BUTTONS */
+    .step-nav { display:flex; justify-content:space-between; margin-top:40px; gap:12px; }
+    .btn {
+      padding:10px 24px; border-radius:8px; font-size:0.88rem;
+      font-family:inherit; cursor:pointer; border:1px solid var(--border);
+      background:var(--bg2); color:var(--text); transition:all 0.2s;
+    }
+    .btn:hover { border-color:var(--accent); color:var(--accent); }
+    .btn.primary { background:var(--green); border-color:var(--green); color:#000; font-weight:700; }
+    .btn.primary:hover { opacity:0.9; color:#000; }
+
+    h3 { font-size:1.05rem; color:var(--text); margin:24px 0 12px; font-weight:600; }
+    p { color:#c9d1d9; font-size:0.9rem; margin-bottom:10px; }
+    ul { padding-left:18px; margin-bottom:12px; }
+    li { color:#c9d1d9; font-size:0.88rem; margin-bottom:6px; }
+    strong { color:var(--text); }
+
+    @media(max-width:600px) {
+      .step-header { flex-direction:column; }
+      .hero-stats { gap:20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">✅ Guida pratica from scratch</div>
+  <h1>Dalla <span>prima idea</span> alla prima vendita</h1>
+  <div class="hero-sub">Guida end-to-end per vendere magliette online — zero esperienza richiesta</div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-val">9</div><div class="stat-label">Step totali</div></div>
+    <div class="stat"><div class="stat-val">€0</div><div class="stat-label">Costo primi 30gg</div></div>
+    <div class="stat"><div class="stat-val">~2 sett</div><div class="stat-label">Prima vendita possibile</div></div>
+    <div class="stat"><div class="stat-val">0</div><div class="stat-label">Stock necessario</div></div>
+  </div>
+</div>
+
+<!-- PROGRESS NAV -->
+<div class="progress-nav">
+  <button class="pnav-item active" onclick="goTo(1)"><span class="step-num">1</span>Mindset</button>
+  <button class="pnav-item" onclick="goTo(2)"><span class="step-num">2</span>Nicchia</button>
+  <button class="pnav-item" onclick="goTo(3)"><span class="step-num">3</span>Legale</button>
+  <button class="pnav-item" onclick="goTo(4)"><span class="step-num">4</span>Account</button>
+  <button class="pnav-item" onclick="goTo(5)"><span class="step-num">5</span>Design</button>
+  <button class="pnav-item" onclick="goTo(6)"><span class="step-num">6</span>Prodotto</button>
+  <button class="pnav-item" onclick="goTo(7)"><span class="step-num">7</span>Sito</button>
+  <button class="pnav-item" onclick="goTo(8)"><span class="step-num">8</span>Marketing</button>
+  <button class="pnav-item" onclick="goTo(9)"><span class="step-num">9</span>Prima vendita</button>
+</div>
+
+<div class="container">
+
+<!-- STEP 1: MINDSET -->
+<div id="step-1" class="step-section active">
+  <div class="step-header">
+    <div class="step-badge">1</div>
+    <div class="step-info">
+      <h2>🧠 Mindset — La regola più importante</h2>
+      <p style="color:var(--muted); font-size:0.88rem; margin:4px 0 0;">Prima di toccare codice o aprire qualsiasi account, leggi questo.</p>
+      <div class="step-meta">
+        <span class="step-tag time">⏱ 20 min</span>
+        <span class="step-tag cost">💶 €0</span>
+        <span class="step-tag diff">📖 Fondamentale</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout danger">
+    <span>🚨</span>
+    <p><strong>Il rischio #1 da developer:</strong> costruire l'infrastruttura perfetta per 3 mesi senza vendere nulla. Tecnologia ≠ business. La prima maglietta si vende con Etsy e Printful in 2 giorni, non con Next.js headless.</p>
+  </div>
+
+  <h3>📐 Il principio: Validate → Build → Scale</h3>
+  <div class="task-list">
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Interiorizza: la prima versione deve essere brutta</h4>
+        <p>Etsy + Printful + 5 design = tutto quello che ti serve per la prima vendita. Il sito custom, le automazioni e il codice vengono DOPO aver validato la nicchia.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Stabilisci una scadenza: prima vendita in 14 giorni</h4>
+        <p>Metti una data. Se non vendi entro 14 giorni di apertura del negozio, cambia nicchia o design — non aggiungere feature.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Definisci il budget iniziale: €0 per il primo mese</h4>
+        <p>Etsy è gratuito (€0,18 a listing), Printful è gratuito, Midjourney free tier esiste. La prima vendita non richiede investimento. Gli ads vengono dopo la validazione.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Accetta che il primo design verrà copiato</h4>
+        <p>Non importa. La velocità di esecuzione è il tuo vantaggio reale — puoi pubblicare nuovi design più velocemente di chiunque altro grazie alle tue skills tech.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout success">
+    <span>💡</span>
+    <p><strong>Mantra:</strong> <em>"Vendo, poi costruisco."</em> Ogni ora di codice prima della prima vendita è un'ora sprecata. Ogni ora di codice dopo la prima vendita è un investimento.</p>
+  </div>
+
+  <div class="step-nav">
+    <div></div>
+    <button class="btn primary" onclick="goTo(2)">Continua: Scegli la Nicchia →</button>
+  </div>
+</div>
+
+<!-- STEP 2: NICCHIA -->
+<div id="step-2" class="step-section">
+  <div class="step-header">
+    <div class="step-badge">2</div>
+    <div class="step-info">
+      <h2>🎯 Scegli la nicchia — con i dati, non con l'istinto</h2>
+      <p style="color:var(--muted); font-size:0.88rem; margin:4px 0 0;">La nicchia sbagliata = zero vendite a prescindere da design e marketing.</p>
+      <div class="step-meta">
+        <span class="step-tag time">⏱ 2-3 ore</span>
+        <span class="step-tag cost">💶 €0</span>
+        <span class="step-tag diff">🔍 Critico</span>
+      </div>
+    </div>
+  </div>
+
+  <h3>📊 Metodo data-driven per trovare la nicchia giusta</h3>
+
+  <div class="task-list">
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Step A — Brainstorming: lista 20 community a cui appartieni o conosci</h4>
+        <p>Developer, gamer, appassionati di una città, fan di un genere musicale, sportivi di una disciplina di nicchia, amanti di animali specifici, hobbysti… Scrivi senza filtri.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Step B — Valida su Etsy: cerca "t-shirt [nicchia]" e conta le recensioni</h4>
+        <p>Vai su <a href="https://etsy.com" target="_blank">etsy.com</a>. Cerca <code>t-shirt developer</code>, <code>t-shirt gamer</code>, ecc. Ordina per "Best Seller". Se i top 5 prodotti hanno 100+ recensioni → domanda confermata. Se hanno 0-10 → mercato troppo piccolo o non acquistano su Etsy.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Step C — Verifica su Google Trends</h4>
+        <p>Vai su <a href="https://trends.google.com" target="_blank">trends.google.com</a>. Cerca la nicchia, filtra per Italia, ultimi 12 mesi. Vuoi una linea stabile o crescente — non decrescente.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Step D — Controlla su Reddit se la community esiste e acquista</h4>
+        <p>Cerca <code>r/[nicchia]</code>. La community ha più di 10.000 iscritti? Parlano di merch, magliette, acquisti? Questo è il tuo bacino di potenziali clienti.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Step E — Scegli UNA nicchia. Solo una.</h4>
+        <p>Non "magliette per tutti". Non "magliette tech E gaming E sport". Una nicchia, un target, un brand. Puoi espandere dopo. Focalizzazione = velocità.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>✅ Criteri di una buona nicchia</h3>
+  <table class="tbl">
+    <tr><th>Criterio</th><th>Sì ✅</th><th>No ❌</th></tr>
+    <tr><td>Dimensione community</td><td>10k+ persone online</td><td>Nicchia locale con 500 persone</td></tr>
+    <tr><td>Prova di acquisto</td><td>Best seller Etsy con 50+ reviews</td><td>Zero risultati su Etsy</td></tr>
+    <tr><td>Identità forte</td><td>"Sono un dev" / "Sono un gamer"</td><td>Interesse generico</td></tr>
+    <tr><td>Trend</td><td>Stabile o crescente</td><td>Calante negli ultimi 12 mesi</td></tr>
+    <tr><td>Competizione</td><td>Alcuni competitor ma non saturato</td><td>Amazon+Redbubble dominano tutto</td></tr>
+  </table>
+
+  <div class="callout info">
+    <span>💡</span>
+    <p><strong>Suggerimento da dev:</strong> la nicchia "developer / programmer humor" è validissima globalmente. Frasi tipo <code>// TODO: fix later</code>, <code>It works on my machine</code>, linguaggi di programmazione, framework specifici. Alta identità tribale + acquirenti digital-native.</p>
+  </div>
+
+  <div class="step-nav">
+    <button class="btn" onclick="goTo(1)">← Indietro</button>
+    <button class="btn primary" onclick="goTo(3)">Continua: Setup Legale →</button>
+  </div>
+</div>
+
+<!-- STEP 3: LEGALE -->
+<div id="step-3" class="step-section">
+  <div class="step-header">
+    <div class="step-badge">3</div>
+    <div class="step-info">
+      <h2>⚖️ Setup Legale — P.IVA e adempimenti</h2>
+      <p style="color:var(--muted); font-size:0.88rem; margin:4px 0 0;">Non salti questo step. Vendere senza P.IVA è reato in Italia.</p>
+      <div class="step-meta">
+        <span class="step-tag time">⏱ 1-2 giorni (attesa)</span>
+        <span class="step-tag cost">💶 €0 apertura + €120/anno CCIAA</span>
+        <span class="step-tag diff">📋 Obbligatorio</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <span>⚠️</span>
+    <p>Puoi <strong>iniziare a progettare e creare</strong> mentre aspetti la P.IVA. Ma non fare vendite prima di averla. Etsy e Printful richiedono P.IVA per fatturare correttamente.</p>
+  </div>
+
+  <div class="task-list">
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>1. Apri P.IVA — Regime Forfettario online</h4>
+        <p>Vai su <a href="https://www.agenziaentrate.gov.it" target="_blank">agenziaentrate.gov.it</a> → "Servizi" → "Aprire una partita IVA". Oppure vai di persona all'ufficio territoriale (gratis, 30 min). Codice ATECO: <code>47.91.10</code> (Commercio al dettaglio via internet). Attivazione in 24-48 ore.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>2. Iscriviti alla Camera di Commercio (CCIAA)</h4>
+        <p>Entro 30 giorni dall'apertura P.IVA. Via <a href="https://startup.registroimprese.it" target="_blank">startup.registroimprese.it</a> oppure tramite commercialista. Costo: ~€120/anno. Genera il numero REA che serve per Etsy/Shopify.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>3. Iscriviti alla Gestione Commercianti INPS</h4>
+        <p>Vai su <a href="https://www.inps.it" target="_blank">inps.it</a> → Gestione Artigiani e Commercianti. Contributi fissi: ~€3.800/anno (indipendenti dal fatturato). Si pagano in 4 rate trimestrali.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>4. Trova un commercialista esperto in e-commerce</h4>
+        <p>Non obbligatorio subito, ma consigliato. Cerca su LinkedIn "commercialista e-commerce [tua città]". Budget: €50-100/mese. Si occupa di: dichiarazione dei redditi, fatturazione UE, OSS se esporti.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>5. Installa Iubenda sul tuo sito (Privacy + Cookie)</h4>
+        <p>Vai su <a href="https://iubenda.com" target="_blank">iubenda.com</a> → piano Essential ~€27/anno. Genera Privacy Policy e Cookie Banner GDPR-compliant. Obbligatorio prima di raccogliere qualsiasi dato utente.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout success">
+    <span>✅</span>
+    <p><strong>Se hai già P.IVA da developer freelance:</strong> aggiungi semplicemente il codice ATECO <code>47.91.10</code> alla tua posizione esistente. Chiama l'Agenzia delle Entrate o fallo online — operazione gratuita in 15 minuti.</p>
+  </div>
+
+  <div class="step-nav">
+    <button class="btn" onclick="goTo(2)">← Indietro</button>
+    <button class="btn primary" onclick="goTo(4)">Continua: Crea gli Account →</button>
+  </div>
+</div>
+
+<!-- STEP 4: ACCOUNT -->
+<div id="step-4" class="step-section">
+  <div class="step-header">
+    <div class="step-badge">4</div>
+    <div class="step-info">
+      <h2>🔧 Crea gli Account — Printful + Etsy</h2>
+      <p style="color:var(--muted); font-size:0.88rem; margin:4px 0 0;">Lo stack minimo per la prima vendita. Tutto gratuito.</p>
+      <div class="step-meta">
+        <span class="step-tag time">⏱ 2-3 ore</span>
+        <span class="step-tag cost">💶 €0 (€0,18 a listing Etsy)</span>
+        <span class="step-tag diff">⚙️ Setup tecnico</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tool-grid">
+    <a class="tool-card" href="https://printful.com" target="_blank">
+      <div class="tool-icon">🖨️</div>
+      <h5>Printful</h5>
+      <p>Stampa e spedisce per te. Integrazione diretta con Etsy e Shopify.</p>
+      <div class="tool-cost">Gratuito — paghi solo quando vendi</div>
+    </a>
+    <a class="tool-card" href="https://etsy.com/sell" target="_blank">
+      <div class="tool-icon">🛍️</div>
+      <h5>Etsy</h5>
+      <p>Marketplace con traffico organico già esistente. Perfetto per validare.</p>
+      <div class="tool-cost">€0,18 per listing + 6,5% su vendita</div>
+    </a>
+    <a class="tool-card" href="https://midjourney.com" target="_blank">
+      <div class="tool-icon">🎨</div>
+      <h5>Midjourney</h5>
+      <p>AI per generare design. Abbonamento Basic per uso commerciale.</p>
+      <div class="tool-cost">$10/mese — obbligatorio per uso commerciale</div>
+    </a>
+    <a class="tool-card" href="https://canva.com" target="_blank">
+      <div class="tool-icon">✏️</div>
+      <h5>Canva Pro</h5>
+      <p>Per rifinire i design, creare mockup social e materiali marketing.</p>
+      <div class="tool-cost">€14,99/mese o alternativa gratuita</div>
+    </a>
+  </div>
+
+  <h3>📋 Setup Printful passo per passo</h3>
+  <div class="task-list">
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Registrati su printful.com con email business</h4>
+        <p>Usa un'email dedicata al progetto (es. <code>info@tuobrand.com</code> o Gmail nuovo). Non usare email personale.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Inserisci dati fiscali nel profilo Printful</h4>
+        <p>Settings → Billing → Tax information. Inserisci P.IVA italiana. Printful non addebiterà IVA sulle tue fatture (operazione B2B intracomunitaria).</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Ordina un campione di maglietta</h4>
+        <p>Products → scegli "Bella+Canvas 3001" o "Stanley/Stella Creator" → Design → upload un design di test → ordina a te stesso con sconto 20% campione. Verifica qualità stampa prima di vendere.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>📋 Setup Etsy passo per passo</h3>
+  <div class="task-list">
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Apri un negozio Etsy: etsy.com/sell</h4>
+        <p>Scegli un nome negozio memorabile e coerente con la nicchia (es. <code>DevThreadsCo</code>, <code>CodeWearShop</code>). Il nome è importante — riflette il brand.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Completa il profilo al 100%</h4>
+        <p>Foto profilo, banner, "Chi siamo", politiche di reso. I negozi con profilo completo rankano meglio nell'algoritmo Etsy.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Collega Printful a Etsy</h4>
+        <p>Su Printful → Stores → Connect → Etsy. Autorizza la connessione. Da questo momento i prodotti che crei su Printful vengono sincronizzati automaticamente su Etsy.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Configura metodo di pagamento Etsy</h4>
+        <p>Settings → Billing. Inserisci carta di credito per i costi (listing + commissioni). I pagamenti dei clienti arriveranno sul tuo conto Etsy e poi sul tuo IBAN ogni settimana.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-nav">
+    <button class="btn" onclick="goTo(3)">← Indietro</button>
+    <button class="btn primary" onclick="goTo(5)">Continua: Crea i Design →</button>
+  </div>
+</div>
+
+<!-- STEP 5: DESIGN -->
+<div id="step-5" class="step-section">
+  <div class="step-header">
+    <div class="step-badge">5</div>
+    <div class="step-info">
+      <h2>🎨 Crea i Design — con AI e senza essere un designer</h2>
+      <p style="color:var(--muted); font-size:0.88rem; margin:4px 0 0;">5 design di partenza. Non 50, non 1. Cinque.</p>
+      <div class="step-meta">
+        <span class="step-tag time">⏱ 3-5 ore</span>
+        <span class="step-tag cost">💶 $10 Midjourney</span>
+        <span class="step-tag diff">🎨 Creativo</span>
+      </div>
+    </div>
+  </div>
+
+  <h3>🤖 Metodo Midjourney per design t-shirt</h3>
+  <div class="task-list">
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Abbonati a Midjourney Basic ($10/mese)</h4>
+        <p>Vai su <a href="https://midjourney.com" target="_blank">midjourney.com</a>. Il piano Basic include 200 generazioni/mese — più che sufficienti per iniziare. <strong>Obbligatorio per uso commerciale.</strong></p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Usa questi prompt template per t-shirt</h4>
+        <p>Formato base: <code>[soggetto], t-shirt vector design, flat design, white background, simple, bold lines, printable</code></p>
+        <p>Esempio nicchia dev: <code>minimalist programmer coffee cup with code symbols, t-shirt vector design, flat design, white background, bold typography, no gradients --ar 1:1</code></p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Esporta in PNG a sfondo trasparente</h4>
+        <p>Upscala il design migliore (U1/U2/U3/U4 in Midjourney). Poi usa <a href="https://remove.bg" target="_blank">remove.bg</a> per rimuovere lo sfondo. Printful richiede PNG trasparente ad almeno 150 DPI.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Alternativa: testo tipografico su Canva</h4>
+        <p>Se non vuoi Midjourney, usa Canva con font bold + frase iconica della tua nicchia. Es: <code>// TODO: sleep</code> in monospace font bianco su nero. Semplice, immediato, identitario.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Crea esattamente 5 design diversi</h4>
+        <p>Non di più. 5 design ti danno abbastanza dati per capire cosa funziona. Varia: 2 grafici + 2 tipografici + 1 ibrido. Osserva quale genera più click su Etsy.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <span>⚠️</span>
+    <p><strong>Copyright — regola assoluta:</strong> mai usare loghi, personaggi, mascotte, citazioni di brand o celebrities protette da copyright/trademark. Anche se "è solo ispirazione". Le piattaforme bannano i negozi senza preavviso e Printful può rifiutare la stampa.</p>
+  </div>
+
+  <div class="step-nav">
+    <button class="btn" onclick="goTo(4)">← Indietro</button>
+    <button class="btn primary" onclick="goTo(6)">Continua: Carica il Prodotto →</button>
+  </div>
+</div>
+
+<!-- STEP 6: PRODOTTO -->
+<div id="step-6" class="step-section">
+  <div class="step-header">
+    <div class="step-badge">6</div>
+    <div class="step-info">
+      <h2>📦 Carica il Prodotto su Printful + Etsy</h2>
+      <p style="color:var(--muted); font-size:0.88rem; margin:4px 0 0;">Dal design al listing pubblicato — il processo completo.</p>
+      <div class="step-meta">
+        <span class="step-tag time">⏱ 1-2 ore per 5 prodotti</span>
+        <span class="step-tag cost">💶 €0,90 (5 listing × €0,18)</span>
+        <span class="step-tag diff">⚙️ Operativo</span>
+      </div>
+    </div>
+  </div>
+
+  <h3>🖨️ Su Printful</h3>
+  <div class="task-list">
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Scegli la maglietta giusta</h4>
+        <p><strong>Bella+Canvas 3001</strong>: popolare, buona qualità, costo ~€11. <strong>Stanley/Stella Creator</strong>: premium organico, costo ~€15, target eco-conscious. Inizia con Bella+Canvas per tenere i costi bassi.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Carica il design nel mockup generator</h4>
+        <p>Products → T-shirts → Bella+Canvas 3001 → Start designing. Carica PNG trasparente. Posiziona al centro, non troppo grande (lascia margini). Scegli colore maglietta (nero e bianco vendono di più).</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Imposta il prezzo con margine corretto</h4>
+        <p>Costo Printful ~€13 + spedizione €3,50 = €16,50 costo base. Prezzo vendita consigliato: <strong>€27,90 – €32,90</strong>. Margine lordo: €11-16. Non scendere sotto €24,90 — segnala bassa qualità.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Sincronizza su Etsy tramite Printful</h4>
+        <p>Dopo aver configurato il prodotto su Printful → Proceed to mockups → Submit to store. Il prodotto appare come bozza su Etsy. Vai su Etsy per completare il listing.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>🛍️ Ottimizza il Listing Etsy</h3>
+  <div class="task-list">
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Titolo SEO-ottimizzato (max 140 caratteri)</h4>
+        <p>Formula: <code>[keyword principale] | [keyword secondaria] | [nicchia] Gift</code>. Es: <code>Developer T-Shirt | Programmer Humor Tee | Funny Coding Gift for Software Engineer</code>. Etsy è un motore di ricerca — ogni parola conta.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>13 tag rilevanti (usa tutti)</h4>
+        <p>Es: <code>developer shirt</code>, <code>programmer gift</code>, <code>coding tshirt</code>, <code>software engineer</code>, <code>funny programmer</code>, <code>coder gift</code>, <code>tech shirt</code>, <code>computer science</code>, <code>geek tshirt</code>, <code>it crowd gift</code>, <code>nerd shirt</code>, <code>javascript shirt</code>, <code>python tshirt</code>. Mix di broad e long-tail.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Descrizione completa (300+ parole)</h4>
+        <p>Prima riga: benefit principale. Poi: materiale, taglie, cura del capo, tempo di spedizione, garanzia. Includi le keyword naturalmente. Finisci con "Perfetto come regalo per [target]".</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Foto prodotto — almeno 5 mockup</h4>
+        <p>Printful genera mockup automatici. Usa anche <a href="https://placeit.net" target="_blank">Placeit.net</a> per mockup lifestyle realistici ($7,95/mese o singolo acquisto). La thumbnail è il fattore #1 di conversione su Etsy.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-nav">
+    <button class="btn" onclick="goTo(5)">← Indietro</button>
+    <button class="btn primary" onclick="goTo(7)">Continua: Setup Sito →</button>
+  </div>
+</div>
+
+<!-- STEP 7: SITO -->
+<div id="step-7" class="step-section">
+  <div class="step-header">
+    <div class="step-badge">7</div>
+    <div class="step-info">
+      <h2>🌐 Setup Sito — Shopify (dopo la validazione)</h2>
+      <p style="color:var(--muted); font-size:0.88rem; margin:4px 0 0;">Apri Shopify solo dopo le prime 3-5 vendite su Etsy. Non prima.</p>
+      <div class="step-meta">
+        <span class="step-tag time">⏱ 1 giorno</span>
+        <span class="step-tag cost">💶 €29/mese</span>
+        <span class="step-tag diff">💻 Dev-friendly</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <span>⚠️</span>
+    <p><strong>Non aprire Shopify subito.</strong> Etsy ha traffico organico già dal giorno 1. Shopify richiede investimento in ads per portare traffico. Inizia da Etsy, valida, poi aggiungi Shopify come canale principale.</p>
+  </div>
+
+  <div class="task-list">
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Apri trial Shopify (3 mesi a €1/mese)</h4>
+        <p>Vai su <a href="https://shopify.com" target="_blank">shopify.com</a> → inizia trial. Piano Basic a €29/mese. Il trial permette 3 mesi a €1/mese — approfitta dell'offerta.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Scegli il tema: Dawn (gratuito) o tema premium</h4>
+        <p>Dawn è il tema default di Shopify — pulito, veloce, ottimizzato per conversioni. Per la prima fase è più che sufficiente. Customizzalo con i colori del tuo brand. Tema premium valutalo a mese 3+.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Collega Printful a Shopify</h4>
+        <p>Shopify App Store → cerca "Printful" → Install. Stessa procedura di Etsy. I prodotti si sincronizzano automaticamente. Ogni ordine su Shopify viene inoltrato automaticamente a Printful per la produzione.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Configura dominio personalizzato</h4>
+        <p>Acquista dominio su <a href="https://namecheap.com" target="_blank">Namecheap</a> (~€10/anno). Collega a Shopify da Settings → Domains. Il dominio rafforza il brand e migliora la SEO.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Pagine obbligatorie: T&C, Privacy, Resi, Contatti</h4>
+        <p>Shopify genera template automatici. Personalizzali con i tuoi dati. <strong>Importante:</strong> specifica che i prodotti personalizzati sono esclusi dal diritto di recesso (art. 59 lett. c Cod. Consumo).</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Installa Klaviyo per email marketing</h4>
+        <p>Shopify App Store → Klaviyo (gratuito fino a 250 contatti). Crea 3 flow automatici: <strong>Welcome Series</strong> (benvenuto + sconto 10%), <strong>Abandoned Cart</strong> (recupero carrello abbandonato), <strong>Post-Purchase</strong> (ringraziamento + upsell).</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Per i dev: considera headless con Next.js</h4>
+        <p>Solo dopo mese 4-5 e 100+ vendite. Shopify Storefront API + Next.js 14 App Router = performance superiori e conversioni più alte. Giustificato solo con traffico costante. <a href="https://shopify.dev/docs/api/storefront" target="_blank">Documentazione qui.</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-nav">
+    <button class="btn" onclick="goTo(6)">← Indietro</button>
+    <button class="btn primary" onclick="goTo(8)">Continua: Marketing →</button>
+  </div>
+</div>
+
+<!-- STEP 8: MARKETING -->
+<div id="step-8" class="step-section">
+  <div class="step-header">
+    <div class="step-badge">8</div>
+    <div class="step-info">
+      <h2>📣 Marketing — Portare traffico senza budget</h2>
+      <p style="color:var(--muted); font-size:0.88rem; margin:4px 0 0;">Prima organic, poi paid. Mai il contrario.</p>
+      <div class="step-meta">
+        <span class="step-tag time">⏱ 30 min/giorno</span>
+        <span class="step-tag cost">💶 €0 (organic)</span>
+        <span class="step-tag diff">📱 Costante</span>
+      </div>
+    </div>
+  </div>
+
+  <h3>📱 Canale 1 — TikTok (priorità massima nel 2026)</h3>
+  <div class="task-list">
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Crea account TikTok business dedicato al brand</h4>
+        <p>Non usare account personale. Account business = accesso a TikTok Analytics e poi a TikTok Shop. Username = nome del brand.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Pubblica 1 video al giorno per i primi 30 giorni</h4>
+        <p>Idee video: unboxing del campione, processo creazione design con AI, "magliette che un developer ama", "design che stavo per pubblicare ma...", behind the scenes del negozio. Durata: 15-30 secondi.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Attiva TikTok Shop quando disponibile</h4>
+        <p>TikTok Shop permette acquisto diretto dal video. Collegalo a Printful tramite <a href="https://apps.shopify.com/tiktok" target="_blank">app TikTok su Shopify</a> o integrazione diretta. Riduce il friction di acquisto enormemente.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>📸 Canale 2 — Instagram</h3>
+  <div class="task-list">
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Account Instagram business con bio ottimizzata</h4>
+        <p>Bio: cosa vendi + chi sei + link al negozio. Usa <a href="https://linktree.com" target="_blank">Linktree</a> per link multipli (Etsy + Shopify + TikTok). Foto profilo = logo del brand.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>3 Reels a settimana + stories quotidiane</h4>
+        <p>Reels: stesso contenuto di TikTok (riusa i video). Stories: sondaggi su nuovi design, "quale preferisci?", countdown nuovi drop. Le Stories costruiscono community, i Reels portano traffico.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Attiva Instagram Shopping</h4>
+        <p>Collega il catalogo Shopify a Instagram Shopping. I prodotti diventano cliccabili direttamente nei post e nelle stories. Riduce i passaggi tra "vedo" e "acquisto".</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>💰 Canale 3 — Meta Ads (da mese 3)</h3>
+  <div class="task-list">
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Installa il Meta Pixel PRIMA di fare ads</h4>
+        <p>Shopify → Preferenze → Facebook Pixel. Installa e lascialo raccogliere dati organici per 30+ giorni prima di avviare campagne. Pixel "caldo" = campagne più efficaci.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Prima campagna: €10/giorno su Acquisti</h4>
+        <p>Campagna Conversioni → obiettivo Acquisto. Usa <strong>Advantage+ Shopping Campaign</strong> — lascia che l'algoritmo ottimizzi. Target: Italia, età 20-45, interessi legati alla tua nicchia. Budget minimo: €300 per il primo test.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Misura ROAS — scala solo sopra 3x</h4>
+        <p>ROAS = Revenue / Spesa Ads. Se spendi €100 e generi €300 vendite → ROAS 3x. Sotto 2x: ferma e cambia creatività. Sopra 3x: aumenta il budget del 20% ogni 3 giorni.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-nav">
+    <button class="btn" onclick="goTo(7)">← Indietro</button>
+    <button class="btn primary" onclick="goTo(9)">Continua: Prima Vendita! →</button>
+  </div>
+</div>
+
+<!-- STEP 9: PRIMA VENDITA -->
+<div id="step-9" class="step-section">
+  <div class="step-header">
+    <div class="step-badge" style="background:var(--orange); font-size:1.5rem;">🎉</div>
+    <div class="step-info">
+      <h2>🏆 La Prima Vendita — e cosa fare dopo</h2>
+      <p style="color:var(--muted); font-size:0.88rem; margin:4px 0 0;">Checklist finale e piano di crescita post-prima vendita.</p>
+      <div class="step-meta">
+        <span class="step-tag time">⏱ Day 1-14</span>
+        <span class="step-tag cost">💶 €0 extra</span>
+        <span class="step-tag diff">🚀 Go live!</span>
+      </div>
+    </div>
+  </div>
+
+  <h3>✅ Checklist finale prima di pubblicare</h3>
+  <div class="task-list">
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>P.IVA aperta e attiva</h4>
+        <p>Verifica che il numero P.IVA sia attivo su <a href="https://telematici.agenziaentrate.gov.it/VerificaCF/Ricerca.do" target="_blank">Agenzia delle Entrate</a>.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Printful collegato a Etsy e funzionante</h4>
+        <p>Fai un ordine di test (usa il coupon Printful per campioni). Verifica che arrivi su Etsy come ordine processato correttamente.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>5 listing pubblicati su Etsy con titolo, tag e foto</h4>
+        <p>Tutti e 5 visibili pubblicamente. Prova a cercare su Etsy il titolo del tuo prodotto — deve apparire nei risultati.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Privacy Policy e T&C pubblicati sul negozio</h4>
+        <p>Obbligatori prima di raccogliere qualsiasi dato cliente. Etsy li richiede nel profilo negozio.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Account TikTok/Instagram creati con primo post</h4>
+        <p>Almeno 1 post già pubblicato. Il profilo non deve essere vuoto quando arrivano i primi visitatori.</p>
+      </div>
+    </div>
+    <div class="task" onclick="toggleTask(this)">
+      <div class="task-check">✓</div>
+      <div class="task-body">
+        <h4>Condividi il negozio con 10 persone di fiducia</h4>
+        <p>Non per farle comprare — per feedback onesto: "il negozio sembra affidabile?", "i prezzi sembrano giusti?", "la descrizione è chiara?". Aggiusta prima di investire in marketing.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>🎯 Dopo la prima vendita — priorità nell'ordine</h3>
+  <table class="tbl">
+    <tr><th>Quando</th><th>Azione</th><th>Perché</th></tr>
+    <tr><td>Immediatamente</td><td>Ringrazia il cliente con messaggio Etsy personalizzato</td><td>Reviews = social proof = più vendite</td></tr>
+    <tr><td>Giorno 1-3</td><td>Analizza quale design ha venduto e perché</td><td>Replica la formula sui prossimi 5 design</td></tr>
+    <tr><td>Settimana 2</td><td>Aggiungi 5 nuovi design simili al vincitore</td><td>Aumenta le probabilità di essere trovato</td></tr>
+    <tr><td>Vendita #5</td><td>Apri Shopify e collega Klaviyo</td><td>Inizia a costruire email list</td></tr>
+    <tr><td>Vendita #10</td><td>Attiva Meta Ads €10/giorno</td><td>Hai validazione, ora scala</td></tr>
+    <tr><td>Mese 3</td><td>Analizza margini, CAC, LTV e ottimizza prezzi</td><td>Data-driven decision making</td></tr>
+    <tr><td>Mese 6</td><td>Registra il marchio UIBM se il brand funziona</td><td>Proteggi il tuo asset</td></tr>
+  </table>
+
+  <div class="callout success">
+    <span>🚀</span>
+    <p><strong>Ricorda:</strong> la prima vendita è la prova che il mercato esiste. La seconda è la prova che non era un caso. La decima è l'inizio di un business. Ogni passo conta — l'importante è iniziare.</p>
+  </div>
+
+  <div style="text-align:center; margin-top:32px; padding:32px; background:var(--bg2); border:1px solid var(--border); border-radius:12px;">
+    <div style="font-size:3rem; margin-bottom:12px;">🎉</div>
+    <h3 style="font-size:1.3rem; color:var(--green); margin:0 0 8px;">Sei pronto. Inizia adesso.</h3>
+    <p style="color:var(--muted);">Ogni giorno che aspetti è un giorno senza dati. I dati sono tutto.</p>
+    <div style="display:flex; gap:12px; justify-content:center; margin-top:20px; flex-wrap:wrap;">
+      <a href="https://printful.com" target="_blank" class="btn primary" style="text-decoration:none;">Apri Printful →</a>
+      <a href="https://etsy.com/sell" target="_blank" class="btn" style="text-decoration:none;">Apri Etsy →</a>
+      <a href="https://midjourney.com" target="_blank" class="btn" style="text-decoration:none;">Apri Midjourney →</a>
+    </div>
+  </div>
+
+  <div class="step-nav">
+    <button class="btn" onclick="goTo(8)">← Indietro</button>
+    <button class="btn primary" onclick="goTo(1)">↺ Ricomincia dall'inizio</button>
+  </div>
+</div>
+
+</div>
+
+<footer style="background:var(--bg2); border-top:1px solid var(--border); text-align:center; padding:20px; font-size:0.8rem; color:var(--muted);">
+  Guida Prima Vendita 2026 · Dario Schioppi · <a href="index.html">← Torna al Business Plan</a>
+</footer>
+
+<script>
+let currentStep = 1;
+
+function goTo(step) {
+  document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.pnav-item').forEach((b, i) => {
+    b.classList.remove('active');
+    if (i + 1 < step) b.classList.add('done');
+    else b.classList.remove('done');
+  });
+  document.getElementById('step-' + step).classList.add('active');
+  document.querySelectorAll('.pnav-item')[step - 1].classList.add('active');
+  currentStep = step;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleTask(el) {
+  el.classList.toggle('checked');
+  const check = el.querySelector('.task-check');
+  check.textContent = el.classList.contains('checked') ? '✓' : '✓';
+}
+</script>
+</body>
+</html>
