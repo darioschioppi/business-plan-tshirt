@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Catalogo Linee — T-Shirt & Felpe | Dario Schioppi</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg2: #161b22;
+    --bg3: #1c2128;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --orange: #d29922;
+    --purple: #bc8cff;
+    --teal: #39d353;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, 'Segoe UI', sans-serif; line-height: 1.7; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .hero {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1a1f2e 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 24px 40px;
+    text-align: center;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(188,140,255,0.1); border: 1px solid rgba(188,140,255,0.3);
+    border-radius: 20px; padding: 5px 16px; font-size: 0.78rem;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--purple); margin-bottom: 20px;
+  }
+  .hero h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 700; color: #fff; margin-bottom: 10px; }
+  .hero h1 span { color: var(--accent); }
+  .hero-sub { color: var(--muted); font-size: 1rem; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px 80px; }
+
+  .filters {
+    display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 32px;
+  }
+  .filter-btn {
+    background: var(--bg2); border: 1px solid var(--border); color: var(--muted);
+    border-radius: 20px; padding: 7px 16px; font-size: 0.82rem; cursor: pointer;
+    font-family: inherit; transition: all 0.2s;
+  }
+  .filter-btn:hover { color: var(--text); border-color: var(--accent); }
+  .filter-btn.active { background: rgba(88,166,255,0.12); color: var(--accent); border-color: var(--accent); }
+
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px;
+  }
+  .card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
+    overflow: hidden; display: flex; flex-direction: column; transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--accent); }
+  .card-img {
+    width: 100%; height: 160px; object-fit: cover; background: var(--bg3);
+    display: block;
+  }
+  .card-img-placeholder {
+    width: 100%; height: 160px; background: var(--bg3); display: flex;
+    align-items: center; justify-content: center; font-size: 2.2rem; color: var(--muted);
+  }
+  .card-body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .card-title { font-size: 1.02rem; font-weight: 600; color: #fff; }
+  .card-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .badge {
+    font-size: 0.72rem; padding: 3px 10px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--bg3); color: var(--muted);
+  }
+  .badge.tipo-Maglietta { color: var(--accent); border-color: rgba(88,166,255,0.3); background: rgba(88,166,255,0.08); }
+  .badge.tipo-Felpa { color: var(--purple); border-color: rgba(188,140,255,0.3); background: rgba(188,140,255,0.08); }
+  .badge.tipo-Altro { color: var(--teal); border-color: rgba(63,185,80,0.3); background: rgba(63,185,80,0.08); }
+  .badge.stato-Idea { color: var(--muted); }
+  .badge.stato-In-lavorazione { color: var(--orange); border-color: rgba(210,153,34,0.3); background: rgba(210,153,34,0.08); }
+  .badge.stato-Pronta { color: var(--green); border-color: rgba(63,185,80,0.3); background: rgba(63,185,80,0.08); }
+  .badge.stato-Pubblicata { color: var(--accent); border-color: rgba(88,166,255,0.3); background: rgba(88,166,255,0.08); }
+  .card-notes { color: var(--muted); font-size: 0.85rem; }
+  .card-date { color: var(--muted); font-size: 0.72rem; margin-top: auto; padding-top: 8px; border-top: 1px solid var(--border); }
+
+  .empty-state {
+    text-align: center; padding: 60px 20px; color: var(--muted);
+  }
+  .empty-state .icon { font-size: 2.6rem; margin-bottom: 16px; }
+
+  .howto {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px 24px; margin-bottom: 32px; font-size: 0.88rem; color: var(--muted);
+  }
+  .howto b { color: var(--text); }
+
+  footer {
+    background: var(--bg2); border-top: 1px solid var(--border); text-align: center;
+    padding: 20px; font-size: 0.8rem; color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">🎨 Catalogo Idee</div>
+  <h1>Catalogo Linee — <span>Maglie, Felpe & Idee</span></h1>
+  <div class="hero-sub">Tutte le linee di prodotto da creare, sempre aggiornate</div>
+</div>
+
+<div class="container">
+
+  <div class="howto">
+    💬 <b>Come si aggiorna:</b> manda un messaggio al bot in chat con la tua idea (es. "aggiungi maglietta con il quadro La Grande Onda") — questa pagina viene aggiornata automaticamente, nessuna azione tecnica richiesta da parte tua.
+  </div>
+
+  <div class="filters" id="filters"></div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="empty-state" id="emptyState" style="display:none;">
+    <div class="icon">📭</div>
+    <div>Nessuna idea salvata ancora. Scrivi in chat la tua prima linea da creare!</div>
+  </div>
+
+</div>
+
+<footer>
+  Catalogo Linee · Dario Schioppi · aggiornato in automatico via chat ·
+  <a href="index.html">📊 Business Plan</a> ·
+  <a href="fornitori.html">💶 Confronto Fornitori</a> ·
+  <a href="guida-prima-vendita.html">📋 Guida Prima Vendita</a>
+</footer>
+
+<script>
+const LINEE = [];
+
+function slug(s) { return s.replace(/\s+/g, '-'); }
+
+function render(filterTipo, filterStato) {
+  const grid = document.getElementById('grid');
+  const empty = document.getElementById('emptyState');
+  grid.innerHTML = '';
+
+  const filtered = LINEE.filter(l =>
+    (filterTipo === 'Tutti' || l.tipo === filterTipo) &&
+    (filterStato === 'Tutti' || l.stato === filterStato)
+  );
+
+  if (LINEE.length === 0) {
+    empty.style.display = 'block';
+    empty.querySelector('div:last-child').textContent = 'Nessuna idea salvata ancora. Scrivi in chat la tua prima linea da creare!';
+    return;
+  }
+  if (filtered.length === 0) {
+    empty.style.display = 'block';
+    empty.querySelector('div:last-child').textContent = 'Nessuna linea corrisponde ai filtri selezionati.';
+    return;
+  }
+  empty.style.display = 'none';
+
+  filtered.slice().reverse().forEach(l => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    const img = l.immagine
+      ? `<img class="card-img" src="${l.immagine}" alt="${l.titolo}" onerror="this.outerHTML='<div class=\\'card-img-placeholder\\'>🖼️</div>'">`
+      : `<div class="card-img-placeholder">🖼️</div>`;
+    card.innerHTML = `
+      ${img}
+      <div class="card-body">
+        <div class="card-title">${l.titolo}</div>
+        <div class="card-tags">
+          <span class="badge tipo-${slug(l.tipo)}">${l.tipo}</span>
+          <span class="badge">${l.soggetto}</span>
+          <span class="badge stato-${slug(l.stato)}">${l.stato}</span>
+        </div>
+        ${l.note ? `<div class="card-notes">${l.note}</div>` : ''}
+        <div class="card-date">${l.data || ''}</div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function buildFilters() {
+  const tipi = ['Tutti', ...new Set(LINEE.map(l => l.tipo))];
+  const stati = ['Tutti', ...new Set(LINEE.map(l => l.stato))];
+  const container = document.getElementById('filters');
+  let currentTipo = 'Tutti', currentStato = 'Tutti';
+
+  function draw() {
+    container.innerHTML = '';
+    tipi.forEach(t => {
+      const b = document.createElement('button');
+      b.className = 'filter-btn' + (t === currentTipo ? ' active' : '');
+      b.textContent = t === 'Tutti' ? 'Tutti i tipi' : t;
+      b.onclick = () => { currentTipo = t; draw(); render(currentTipo, currentStato); };
+      container.appendChild(b);
+    });
+    const sep = document.createElement('span');
+    sep.style.width = '1px'; sep.style.background = 'var(--border)'; sep.style.margin = '0 4px';
+    container.appendChild(sep);
+    stati.forEach(s => {
+      const b = document.createElement('button');
+      b.className = 'filter-btn' + (s === currentStato ? ' active' : '');
+      b.textContent = s === 'Tutti' ? 'Tutti gli stati' : s;
+      b.onclick = () => { currentStato = s; draw(); render(currentTipo, currentStato); };
+      container.appendChild(b);
+    });
+  }
+  draw();
+}
+
+buildFilters();
+render('Tutti', 'Tutti');
+</script>
+
+</body>
+</html>
